@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Perguntas e Respostas</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+    }
+    h1 {
+      color: #2c3e50;
+      text-align: center;
+    }
+    .input-area {
+      margin-bottom: 20px;
+    }
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      resize: none;
+      height: 100px;
+      font-size: 16px;
+    }
+    button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    button:disabled {
+      background-color: #95a5a6;
+      cursor: not-allowed;
+    }
+    .resposta-area {
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background-color: #f9f9f9;
+      min-height: 100px;
+    }
+    .loading {
+      display: none;
+      text-align: center;
+      margin: 10px 0;
+    }
+    .loading-spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3498db;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Sistema de Perguntas e Respostas</h1>
+    
+    <div class="input-area">
+      <textarea id="perguntaInput" placeholder="Digite sua pergunta aqui..."></textarea>
+      <div class="loading" id="loadingIndicator">
+        <div class="loading-spinner"></div>
+        <p>Processando sua pergunta...</p>
+      </div>
+      <button id="enviarBtn">Enviar Pergunta</button>
+    </div>
+    
+    <div class="resposta-area" id="respostaArea">
+      <p>Sua resposta aparecerá aqui...</p>
+    </div>
+  </div>
+
+  <script>
+    const perguntaInput = document.getElementById('perguntaInput');
+    const enviarBtn = document.getElementById('enviarBtn');
+    const respostaArea = document.getElementById('respostaArea');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+
+    enviarBtn.addEventListener('click', async () => {
+      const pergunta = perguntaInput.value.trim();
+      
+      if (!pergunta) {
+        alert('Por favor, digite uma pergunta.');
+        return;
+      }
+      
+      // Mostrar loading
+      enviarBtn.disabled = true;
+      loadingIndicator.style.display = 'block';
+      
+      try {
+        const resposta = await window.electronAPI.enviarPergunta(pergunta);
+        respostaArea.innerHTML = `<p><strong>Sua pergunta:</strong> ${pergunta}</p><hr><p><strong>Resposta:</strong> ${resposta}</p>`;
+      } catch (error) {
+        respostaArea.innerHTML = `<p style="color: red;">Erro ao processar pergunta: ${error.message}</p>`;
+      } finally {
+        // Esconder loading
+        enviarBtn.disabled = false;
+        loadingIndicator.style.display = 'none';
+        perguntaInput.value = '';
+      }
+    });
+    perguntaInput.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 'Enter') {
+        enviarBtn.click();
+      }
+    });
+  </script>
+</body>
+</html>
