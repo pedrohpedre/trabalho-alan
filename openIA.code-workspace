@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "../openIA"
+		},
+		{
+			"path": "."
+		},
+		{
+			"path": "../deepseek/node_modules"
+		}
+	]
+}
